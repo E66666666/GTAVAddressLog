@@ -11,6 +11,7 @@
 #include "Util/Util.hpp"
 #include "Util/Logger.hpp"
 #include "inc/enums.h"
+#include "Util/Versions.h"
 
 Hash model;
 Vehicle vehicle = 0;
@@ -71,6 +72,45 @@ std::string prettyNameFromHash(Hash hash) {
 	return displayName;
 }
 
+uint64_t GetWheelsPtr(Vehicle handle) {
+	auto address = GetAddressOfEntity(handle);
+
+	auto offset = getGameVersion() > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80;
+	offset = getGameVersion() > G_VER_1_0_463_1_NOSTEAM ? 0xA90 : offset;
+	offset = getGameVersion() > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset;
+	offset = getGameVersion() > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset;
+	offset = getGameVersion() > G_VER_1_0_877_1_NOSTEAM ? 0xB10 : offset;
+	offset = getGameVersion() > G_VER_1_0_1032_1_NOSTEAM ? 0xB20 : offset;
+
+	return *reinterpret_cast<uint64_t *>(address + offset);
+}
+
+uint8_t GetNumWheels(Vehicle handle) {
+	auto address = GetAddressOfEntity(handle);
+
+	auto offset = getGameVersion() > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80;
+	offset = getGameVersion() > G_VER_1_0_463_1_NOSTEAM ? 0xA90 : offset;
+	offset = getGameVersion() > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset;
+	offset = getGameVersion() > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset;
+	offset = getGameVersion() > G_VER_1_0_877_1_NOSTEAM ? 0xB10 : offset;
+	offset = getGameVersion() > G_VER_1_0_1032_1_NOSTEAM ? 0xB20 : offset;
+
+	offset += 8;
+
+	return *reinterpret_cast<int *>(address + offset);
+}
+
+std::vector<uint64_t> GetWheelPtrs(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);  // pointer to wheel pointers
+	auto numWheels = GetNumWheels(handle);
+	std::vector<uint64_t> wheelPtrs;
+	for (auto i = 0; i < numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		wheelPtrs.push_back(wheelAddr);
+	}
+	return wheelPtrs;
+}
+
 void update_game() {
 	player = PLAYER::PLAYER_ID();
 	playerPed = PLAYER::PLAYER_PED_ID();
@@ -101,8 +141,16 @@ void update_game() {
 		hashAsHex << "0x" << std::setfill('0') << std::setw(12) << std::uppercase << std::hex << address;
 		logStream << std::left << std::setw(16) << std::setfill(' ') << hashAsHex.str();
 		logStream << std::left << std::setw(16) << std::setfill(' ') << prettyNameFromHash(model);
-
 		logger.Write(logStream.str());
+
+		int i = 0;
+		for (auto address : GetWheelPtrs(vehicle)) {
+			std::stringstream ssWheelAddress;
+			ssWheelAddress << std::hex << address;
+			logger.Write("\t\tWheel " + std::to_string(i) + " address: " + ssWheelAddress.str());
+			i++;
+		}
+
 
 		cpyToClipboard(GetDesktopWindow(), hashAsHex.str());
 	}
