@@ -1,4 +1,5 @@
 #include "script.h"
+#include <inc/nativeCaller.h>
 #include "Util/Paths.h"
 #include "Util/Logger.hpp"
 #include "Util/Versions.h"

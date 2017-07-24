@@ -1,8 +1,11 @@
 #define NOMINMAX
 #include "../../../ScriptHookV_SDK/inc/natives.h"
-#include "../../../ScriptHookV_SDK/inc/enums.h"
 #include "Util.hpp"
 #include <algorithm>
+
+void showText(float x, float y, float scale, std::string text, int font, const Color &rgba, bool outline) {
+	showText(x, y, scale, text.c_str(), font, rgba, outline);
+}
 
 void showText(float x, float y, float scale, const char* text, int font, const Color &rgba, bool outline) {
 	UI::SET_TEXT_FONT(font);
@@ -30,7 +33,7 @@ void showNotification(const char* message, int *prevNotification) {
 	}
 }
 
-void shownNotification(std::string message, int *prevNotification) {
+void showNotification(std::string message, int *prevNotification) {
 	showNotification(message.c_str(), prevNotification);
 }
 

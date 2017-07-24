@@ -5,9 +5,12 @@
 #include <sstream>
 #include <iomanip>
 
+#include <inc/natives.h>
+
 #include "Util/Paths.h"
 #include "Util/Util.hpp"
 #include "Util/Logger.hpp"
+#include "inc/enums.h"
 
 Hash model;
 Vehicle vehicle = 0;
@@ -91,7 +94,7 @@ void update_game() {
 	if (vehicle != prevVehicle) {
 		auto address = GetAddressOfEntity(vehicle);
 		prevVehicle = vehicle;
-		showNotification(("New vehicle: " + vehicleName).c_str(), &prevNotification);
+		showNotification("New vehicle: " + vehicleName, &prevNotification);
 
 		std::stringstream hashAsHex;
 		std::stringstream logStream;
