@@ -4,8 +4,9 @@
 #include "Util/Logger.hpp"
 #include "Util/Versions.h"
 
-std::string modDir;
+#define DISPLAY_VERSION "1.0.0"
 
+std::string modDir;
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 {
 	modDir = "\\" + Paths::GetModuleNameWithoutExtension(hInstance);

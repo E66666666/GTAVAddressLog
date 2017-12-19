@@ -10,8 +10,6 @@
 #include "Util/Paths.h"
 #include "Util/Util.hpp"
 #include "Util/Logger.hpp"
-#include "inc/enums.h"
-#include "Util/Versions.h"
 
 Hash model;
 Vehicle vehicle = 0;
@@ -22,6 +20,10 @@ Ped playerPed;
 int prevNotification;
 
 uint64_t(*GetAddressOfEntity)(Entity entity);
+
+int wheelsPtrOffset;
+int numWheelsOffset;
+
 
 uintptr_t FindPattern(const char* pattern, const char* mask) {
 	MODULEINFO modInfo = { nullptr };
@@ -45,6 +47,12 @@ uintptr_t FindPattern(const char* pattern, const char* mask) {
 		}
 	}
 	return 0;
+}
+
+void initOffsets() {
+    auto addr = FindPattern("\x3B\xB7\x48\x0B\x00\x00\x7D\x0D", "xx????xx");
+    wheelsPtrOffset = addr == 0 ? 0 : *(int*)(addr + 2) - 8;
+    numWheelsOffset = addr == 0 ? 0 : *(int*)(addr + 2);
 }
 
 void cpyToClipboard(HWND hwnd, const std::string &s)
@@ -73,32 +81,17 @@ std::string prettyNameFromHash(Hash hash) {
 }
 
 uint64_t GetWheelsPtr(Vehicle handle) {
-	auto address = GetAddressOfEntity(handle);
-
-	auto offset = getGameVersion() > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80;
-	offset = getGameVersion() > G_VER_1_0_463_1_NOSTEAM ? 0xA90 : offset;
-	offset = getGameVersion() > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset;
-	offset = getGameVersion() > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset;
-	offset = getGameVersion() > G_VER_1_0_877_1_NOSTEAM ? 0xB10 : offset;
-	offset = getGameVersion() > G_VER_1_0_1032_1_NOSTEAM ? 0xB20 : offset;
-
-	return *reinterpret_cast<uint64_t *>(address + offset);
+    if (wheelsPtrOffset == 0) return 0;
+    auto address = GetAddressOfEntity(handle);
+    return *reinterpret_cast<uint64_t *>(address + wheelsPtrOffset);
 }
 
 uint8_t GetNumWheels(Vehicle handle) {
-	auto address = GetAddressOfEntity(handle);
-
-	auto offset = getGameVersion() > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80;
-	offset = getGameVersion() > G_VER_1_0_463_1_NOSTEAM ? 0xA90 : offset;
-	offset = getGameVersion() > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset;
-	offset = getGameVersion() > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset;
-	offset = getGameVersion() > G_VER_1_0_877_1_NOSTEAM ? 0xB10 : offset;
-	offset = getGameVersion() > G_VER_1_0_1032_1_NOSTEAM ? 0xB20 : offset;
-
-	offset += 8;
-
-	return *reinterpret_cast<int *>(address + offset);
+    if (numWheelsOffset == 0) return 0;
+    auto address = GetAddressOfEntity(handle);
+    return *reinterpret_cast<int *>(address + numWheelsOffset);
 }
+
 
 std::vector<uint64_t> GetWheelPtrs(Vehicle handle) {
 	auto wheelPtr = GetWheelsPtr(handle);  // pointer to wheel pointers
@@ -158,14 +151,22 @@ void update_game() {
 
 void main() {
 	logger.Write("Script started");
-
+    initOffsets();
 	uintptr_t GetAddressOfEntityAddress = FindPattern("\x83\xF9\xFF\x74\x31\x4C\x8B\x0D\x00\x00\x00\x00\x44\x8B\xC1\x49\x8B\x41\x08",
 												 "xxxxxxxx????xxxxxxx");
 
 	if (GetAddressOfEntityAddress == 0) {
-		logger.Write("Could not find GetAddressOfEntity");
+		logger.Write("Couldn't find GetAddressOfEntity");
 		return;
 	}
+    if (wheelsPtrOffset == 0) {
+        logger.Write("Couldn't find wheel ptr offset");
+        return;
+    }
+    if (numWheelsOffset == 0) {
+        logger.Write("Couldn't find wheel count offset");
+        return;
+    }
 
 	GetAddressOfEntity = reinterpret_cast<uint64_t(*)(Entity)>(GetAddressOfEntityAddress);
 
