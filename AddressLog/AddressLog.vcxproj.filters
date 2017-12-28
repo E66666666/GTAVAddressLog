@@ -15,6 +15,7 @@
     <ClCompile Include="Util\Util.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="MakeNameStuff.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -45,6 +46,7 @@
     <ClInclude Include="Util\Versions.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="MakeNameStuff.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ScriptHookV_SDK">

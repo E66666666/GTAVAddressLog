@@ -10,6 +10,7 @@
 #include "Util/Paths.h"
 #include "Util/Util.hpp"
 #include "Util/Logger.hpp"
+#include "MakeNameStuff.h"
 
 Hash model;
 Vehicle vehicle = 0;
@@ -127,14 +128,19 @@ void update_game() {
 	if (vehicle != prevVehicle) {
 		auto address = GetAddressOfEntity(vehicle);
 		prevVehicle = vehicle;
-		showNotification("New vehicle: " + vehicleName, &prevNotification);
 
-		std::stringstream hashAsHex;
+        std::string makeName = UI::_GET_LABEL_TEXT(MemoryAccess::GetVehicleMakeName(model));
+
+		showNotification("New vehicle: " + makeName + " " + vehicleName, &prevNotification);
+
+	    std::stringstream hashAsHex;
 		std::stringstream logStream;
 		hashAsHex << "0x" << std::setfill('0') << std::setw(12) << std::uppercase << std::hex << address;
-		logStream << std::left << std::setw(16) << std::setfill(' ') << hashAsHex.str();
-		logStream << std::left << std::setw(16) << std::setfill(' ') << prettyNameFromHash(model);
+        logStream << std::left << std::setw(16) << std::setfill(' ') << hashAsHex.str();
+        logStream << std::left << std::setw(16) << std::setfill(' ') << makeName;
+	    logStream << std::left << std::setw(16) << std::setfill(' ') << vehicleName;
 		logger.Write(logStream.str());
+
 
 		int i = 0;
 		for (auto address : GetWheelPtrs(vehicle)) {
@@ -152,7 +158,8 @@ void update_game() {
 void main() {
 	logger.Write("Script started");
     initOffsets();
-	uintptr_t GetAddressOfEntityAddress = FindPattern("\x83\xF9\xFF\x74\x31\x4C\x8B\x0D\x00\x00\x00\x00\x44\x8B\xC1\x49\x8B\x41\x08",
+    MemoryAccess::Init();
+    uintptr_t GetAddressOfEntityAddress = FindPattern("\x83\xF9\xFF\x74\x31\x4C\x8B\x0D\x00\x00\x00\x00\x44\x8B\xC1\x49\x8B\x41\x08",
 												 "xxxxxxxx????xxxxxxx");
 
 	if (GetAddressOfEntityAddress == 0) {
