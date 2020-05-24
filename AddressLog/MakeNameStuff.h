@@ -1,7 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include "inc/natives.h"
+
+#include <vector>
+#include <array>
+
+#include <inc/natives.h>
 
 struct HashNode {
     int hash;

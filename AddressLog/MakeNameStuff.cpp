@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <Psapi.h>
 #include "MakeNameStuff.h"
+#include "Util/Logger.hpp"
 
 typedef void*(*GetModelInfo_t)(unsigned int modelHash, int* index);
 GetModelInfo_t GetModelInfo;
@@ -8,15 +9,35 @@ GetModelInfo_t GetModelInfo;
 int gameVersion = getGameVersion();
 
 void MemoryAccess::Init() {
+    uintptr_t addr;
 
-    auto addr = FindPattern("\x0F\xB7\x05\x00\x00\x00\x00"
-        "\x45\x33\xC9\x4C\x8B\xDA\x66\x85\xC0"
-        "\x0F\x84\x00\x00\x00\x00"
-        "\x44\x0F\xB7\xC0\x33\xD2\x8B\xC1\x41\xF7\xF0\x48"
-        "\x8B\x05\x00\x00\x00\x00"
-        "\x4C\x8B\x14\xD0\xEB\x09\x41\x3B\x0A\x74\x54",
-        "xxx????xxxxxxxxxxx????"
-        "xxxxxxxxxxxxxx????xxxxxxxxxxx");
+    if (gameVersion <= 56) {
+        addr = FindPattern(
+            "\x0F\xB7\x05\x00\x00\x00\x00"
+            "\x45\x33\xC9\x4C\x8B\xDA\x66\x85\xC0"
+            "\x0F\x84\x00\x00\x00\x00"
+            "\x44\x0F\xB7\xC0\x33\xD2\x8B\xC1\x41\xF7\xF0\x48"
+            "\x8B\x05\x00\x00\x00\x00"
+            "\x4C\x8B\x14\xD0\xEB\x09\x41\x3B\x0A\x74\x54",
+            "xxx????"
+            "xxxxxxxxx"
+            "xx????"
+            "xxxxxxxxxxxx"
+            "xx????"
+            "xxxxxxxxxxx");
+
+        if (!addr) {
+            logger.Write(ERROR, "Couldn't find GetModelInfo");
+        }
+    }
+    else {
+        addr = FindPattern("\xEB\x09\x41\x3B\x0A\x74\x54", "xxxxxxx");
+        if (!addr) {
+            logger.Write(ERROR, "Couldn't find GetModelInfo (v57+)");
+        }
+        addr = addr - 0x2C;
+    }
+
     GetModelInfo = (GetModelInfo_t)(addr);
 }
 

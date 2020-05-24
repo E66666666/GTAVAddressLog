@@ -73,7 +73,7 @@ void cpyToClipboard(HWND hwnd, const std::string &s)
 }
 
 std::string prettyNameFromHash(Hash hash) {
-	char *name = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash);
+	auto* name = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash);
 	std::string displayName = UI::_GET_LABEL_TEXT(name);
 	if (displayName == "NULL") {
 		displayName = name;
@@ -139,14 +139,14 @@ void update_game() {
         logStream << std::left << std::setw(16) << std::setfill(' ') << hashAsHex.str();
         logStream << std::left << std::setw(16) << std::setfill(' ') << makeName;
 	    logStream << std::left << std::setw(16) << std::setfill(' ') << vehicleName;
-		logger.Write(logStream.str());
+		logger.Write(INFO, logStream.str());
 
 
 		int i = 0;
 		for (auto address : GetWheelPtrs(vehicle)) {
 			std::stringstream ssWheelAddress;
 			ssWheelAddress << std::hex << address;
-			logger.Write("\t\tWheel " + std::to_string(i) + " address: " + ssWheelAddress.str());
+			logger.Write(INFO, "\t\tWheel " + std::to_string(i) + " address: " + ssWheelAddress.str());
 			i++;
 		}
 
@@ -156,22 +156,22 @@ void update_game() {
 }
 
 void main() {
-	logger.Write("Script started");
+	logger.Write(INFO, "Script started");
     initOffsets();
     MemoryAccess::Init();
     uintptr_t GetAddressOfEntityAddress = FindPattern("\x83\xF9\xFF\x74\x31\x4C\x8B\x0D\x00\x00\x00\x00\x44\x8B\xC1\x49\x8B\x41\x08",
 												 "xxxxxxxx????xxxxxxx");
 
 	if (GetAddressOfEntityAddress == 0) {
-		logger.Write("Couldn't find GetAddressOfEntity");
+		logger.Write(ERROR, "Couldn't find GetAddressOfEntity");
 		return;
 	}
     if (wheelsPtrOffset == 0) {
-        logger.Write("Couldn't find wheel ptr offset");
+        logger.Write(ERROR, "Couldn't find wheel ptr offset");
         return;
     }
     if (numWheelsOffset == 0) {
-        logger.Write("Couldn't find wheel count offset");
+        logger.Write(ERROR, "Couldn't find wheel count offset");
         return;
     }
 

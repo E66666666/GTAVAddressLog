@@ -19,18 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
-    <ClInclude Include="..\..\ScriptHookV_SDK\inc\enums.h">
-      <Filter>ScriptHookV_SDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h">
-      <Filter>ScriptHookV_SDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h">
-      <Filter>ScriptHookV_SDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h">
-      <Filter>ScriptHookV_SDK</Filter>
-    </ClInclude>
     <ClInclude Include="Util\Logger.hpp">
       <Filter>Util</Filter>
     </ClInclude>
@@ -47,13 +35,33 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="MakeNameStuff.h" />
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\main.h">
+      <Filter>ScriptHookV_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\enums.h">
+      <Filter>ScriptHookV_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\types.h">
+      <Filter>ScriptHookV_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\natives.h">
+      <Filter>ScriptHookV_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\nativeCaller.h">
+      <Filter>ScriptHookV_SDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="ScriptHookV_SDK">
-      <UniqueIdentifier>{798a46e9-95e1-4c1b-b2c6-fa538ea8e4e1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Util">
       <UniqueIdentifier>{28b1ba19-aeb3-41fe-86f1-bc771f92c72c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ScriptHookV_SDK">
+      <UniqueIdentifier>{754351d1-0c99-44e7-9c58-36cd3c6b06d1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\thirdparty\ScriptHookV_SDK\lib\ScriptHookV.lib">
+      <Filter>ScriptHookV_SDK</Filter>
+    </Library>
   </ItemGroup>
 </Project>

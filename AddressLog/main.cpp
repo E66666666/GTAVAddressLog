@@ -18,9 +18,9 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 	case DLL_PROCESS_ATTACH:
 		scriptRegister(hInstance, ScriptMain);
 		logger.Clear();
-		logger.Write(Paths::GetModuleNameWithoutExtension(hInstance) + " " + std::string(DISPLAY_VERSION));
-		logger.Write("Game version " + eGameVersionToString(getGameVersion()));
-		logger.Write("Script registered");
+		logger.Write(INFO, Paths::GetModuleNameWithoutExtension(hInstance) + " " + std::string(DISPLAY_VERSION));
+		logger.Write(INFO, "Game version " + eGameVersionToString(getGameVersion()));
+		logger.Write(INFO, "Script registered");
 		break;
 	case DLL_PROCESS_DETACH:
 		scriptUnregister(hInstance);
